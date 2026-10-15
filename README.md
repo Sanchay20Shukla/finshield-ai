@@ -1,16 +1,20 @@
 # FinShield — Explainable Fraud Intelligence
 
+**[Open the live FinShield AI Streamlit app](https://sanchay-finshield-ai.streamlit.app/)** — executive charts, alert queue, transaction scoring, SHAP evidence and investigation workspace. No installation or sign-in required.
+
+**[Working Model and reviewer guide](Working%20Model.md)**
+
 A working fraud-detection portfolio project that connects **XGBoost inference, TreeSHAP explanations, policy rules, and an investigation UI**. Built for post-transaction analysis on synthetic PaySim data.
 
 ## Try it in 90 seconds
 
-1. Open the **live demo** (repository website link).
-2. Choose **Score a transaction → Load fraud example**. Inspect probability, policy score, rules, and SHAP contributions.
-3. Load a legitimate example, then change its amount or balances and run the real model again.
-4. Open **Transaction queue**, inspect a case, save a local analyst review, and download the evidence report.
-5. Read **Model & methodology** for the assumptions and limitations.
+1. Open the **[live Streamlit app](https://sanchay-finshield-ai.streamlit.app/)**.
+2. Review the **Executive dashboard** charts and sample-data caveat.
+3. Choose **Score transaction**, adjust amount or balances, and submit to run the trained model.
+4. Open **Alert queue** or **Transaction 360°** to inspect model drivers, policy evidence and account context.
+5. Explore **Investigations** and **Model monitoring**. All workflow decisions are simulated.
 
-The public demo needs **no login, API key, server startup, or dataset download**. It runs the actual exported 350-tree XGBoost model in the browser, not randomized scores or a rules-only substitute.
+The Streamlit demo needs **no login, API key, server startup, or dataset download**. It runs the included trained XGBoost model in Python with the curated synthetic PaySim sample. The separate `web/` application runs an exported 350-tree model in the browser.
 
 ## What is implemented
 
@@ -27,7 +31,9 @@ The public demo needs **no login, API key, server startup, or dataset download**
 
 ### Public demo versus full platform
 
-GitHub Pages serves a static application. It has **no live Python API or PostgreSQL server**. Notes persist only in the visitor's browser. The included cases have precomputed real TreeSHAP values; arbitrary-input SHAP runs in the Python API. The browser UI labels these distinctions explicitly.
+The live Streamlit application runs Python scoring directly without a separate API service. It uses the included curated 168-row sample, which is enriched by label and type and is not representative population data. Its case notes and monitoring state are shared demonstration state, resettable when hosting restarts; use sample information only.
+
+The separate `web/` output is suitable for GitHub Pages. It has no live Python API or PostgreSQL server. Its notes persist only in the visitor's browser. Its included cases have precomputed real TreeSHAP values; arbitrary-input SHAP runs in the Python platform.
 
 ## Run locally
 
@@ -39,7 +45,7 @@ python -m venv .venv
 # macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
 python -m pytest -q
-python -m streamlit rundashboard/app.py
+python -m streamlit run dashboard/app.py
 ```
 
 Open http://localhost:8501. In another terminal with the environment activated:

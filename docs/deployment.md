@@ -1,5 +1,11 @@
 # Deployment
 
+## Live Streamlit application
+
+[Open FinShield AI](https://sanchay-finshield-ai.streamlit.app/).
+
+Community Cloud uses this repository's `main` branch, `dashboard/app.py`, Python 3.11 and root `requirements.txt`. Included model artifacts and the curated 168-row sample let the dashboard run without a separate API or database server. Do not configure private production data or API credentials for this public portfolio demonstration. Case notes and telemetry use shared temporary hosting storage and can reset after a restart.
+
 ## Public interviewer demo
 
 The `web/` directory is self-contained static output, including real XGBoost trees and supplied-case TreeSHAP explanations. GitHub Actions publishes it through GitHub Pages on pushes to `main`. In repository Settings → Pages, source must be **GitHub Actions**. The public URL is recorded in the repository website field after successful deployment.
