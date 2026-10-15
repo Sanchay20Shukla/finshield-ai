@@ -1,0 +1,1 @@
+"""Investigation copilot retrieval components."""

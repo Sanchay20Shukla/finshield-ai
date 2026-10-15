@@ -1,0 +1,9 @@
+{
+  "dataset": "PaySim synthetic mobile money dataset",
+  "source": "https://www.kaggle.com/datasets/ealaxi/paysim1",
+  "sample": "Up to 24 records per label/type stratum, deterministic hash selection. Not representative prevalence.",
+  "rows": 168,
+  "model_sha256": "63226f520d0ece2138d0da11a2a90beb7717c85f0b0ab114624c16974ea67469",
+  "mode": "Post-transaction detection; post-event balances are required.",
+  "evaluation": "Historical artifact metrics are not a freshly reproduced benchmark or production guarantee."
+}

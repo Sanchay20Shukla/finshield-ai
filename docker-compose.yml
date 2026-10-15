@@ -1,0 +1,77 @@
+name: finshield-ai
+
+services:
+  finshield-api:
+    container_name: finshield-api
+    build: .
+    command: ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      FINSHIELD_ENV: container
+      MODEL_PATH: /app/models/xgboost.joblib
+      DATABASE_URL: postgresql://finshield:finshield@postgres:5432/finshield
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models:ro
+      - ./data/processed:/app/data/processed
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/ready', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
+
+  finshield-dashboard:
+    container_name: finshield-dashboard
+    build: .
+    command: ["python", "-m", "streamlit", "run", "dashboard/app.py", "--server.address=0.0.0.0", "--server.port=8501", "--server.headless=true", "--browser.gatherUsageStats=false"]
+    environment:
+      FINSHIELD_ENV: container
+      MODEL_PATH: /app/models/xgboost.joblib
+      DATABASE_URL: postgresql://finshield:finshield@postgres:5432/finshield
+      API_BASE_URL: http://finshield-api:8000
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./models:/app/models:ro
+      - ./data/raw:/app/data/raw:ro
+      - ./data/processed:/app/data/processed
+    depends_on:
+      finshield-api:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8501/_stcore/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  postgres:
+    container_name: finshield-postgres
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: finshield
+      POSTGRES_USER: finshield
+      POSTGRES_PASSWORD: finshield
+    ports:
+      - "5432:5432"
+    volumes:
+      - finshield_postgres:/var/lib/postgresql/data
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U finshield -d finshield"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  finshield_postgres:
