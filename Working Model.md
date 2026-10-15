@@ -6,6 +6,8 @@
 
 The app opens directly in a browser. No installation, API key or sign-in is needed. If inactive hosting has put it to sleep, allow it to wake up.
 
+![Live FinShield Streamlit dashboard](docs/images/live-streamlit.png)
+
 ## What to explore
 
 | Workspace | What it demonstrates |
