@@ -6,6 +6,10 @@ from time import perf_counter
 from api.routes.scoring import router as scoring_router
 from src.monitoring.telemetry import MonitoringRepository
 from fastapi import HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
+from pathlib import Path
+from api.routes.platform import router as platform_router
 
 
 app = FastAPI(
@@ -14,6 +18,15 @@ app = FastAPI(
     version="1.0.0",
 )
 app.include_router(scoring_router)
+app.include_router(platform_router)
+
+
+@app.get("/", include_in_schema=False)
+def home():
+    return RedirectResponse("/platform/")
+
+
+app.mount("/platform", StaticFiles(directory=Path(__file__).resolve().parents[1] / "frontend", html=True), name="platform")
 
 
 @app.middleware("http")

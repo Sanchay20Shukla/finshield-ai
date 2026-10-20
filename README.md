@@ -1,5 +1,61 @@
 # FinShield — Explainable Fraud Intelligence
 
+## Full PaySim platform — connected frontend
+
+Open **[the local platform](http://127.0.0.1:8000/platform/)** after starting it:
+
+```powershell
+cd finshield-ai
+.\start.ps1
+```
+
+The new frontend extends the existing project with full-dataset analytics,
+searchable transactions, live XGBoost + SHAP, prior account history, persistent
+case reviews and audit events, evidence summaries, drift monitoring and exports.
+The source contains **6,362,620 transactions and 8,213 labeled fraud events** over
+743 simulated hours. The script builds a DuckDB analytics warehouse on first use.
+Download PaySim into `data/raw/paysim.csv` if it is absent; the source is not tracked.
+
+On another OS, install `requirements.txt`, run
+`python -m src.data.warehouse --csv data/raw/paysim.csv`, then
+`python -m uvicorn api.main:app --host 127.0.0.1 --port 8000`.
+
+Portfolio risk bands and alerts use a documented rule baseline; individual
+investigations execute the original trained XGBoost model with historical account
+features from the full dataset. Analyst reviews persist locally in SQLite with
+an event history. This workspace is designed for a single user on localhost.
+
+Evidence summaries work without a key and are labeled **local, non-LLM** output.
+Set `OPENAI_API_KEY` and `OPENAI_MODEL` in the process environment to enable the
+existing optional LLM provider. Dataset fraud labels are excluded from its evidence.
+
+### Reproduce the benchmark and reporting exports
+
+```bash
+python -m scripts.benchmark_platform
+python -m scripts.export_reporting
+```
+
+The benchmark computes history over the entire dataset before deterministic 3%
+negative sampling, retains all fraud, and splits at simulation hours 323/378.
+Thresholds minimize validation financial cost. Holdout metrics use inverse
+probability weights; population estimates are approximate. Models include Logistic
+Regression, Random Forest, XGBoost, Isolation Forest and a rule baseline.
+Fresh results are in `models/reproduced/benchmark.json` and Model intelligence.
+The benchmark preserves the original serving model. The three supervised models
+tied at zero estimated validation cost; the deterministic first-model tie winner
+does not demonstrate better holdout performance. Isolation scores are anomaly
+indices, not calibrated probabilities. Synthetic performance is not a production claim.
+
+Power BI: [reporting guide](powerbi/README.md), [DAX measures](powerbi/Measures.dax),
+[PostgreSQL star views](sql/star_schema.sql). Daily/channel CSVs use the full source.
+A native `.pbix` is not included. Geography is UNKNOWN; dates are simulation-relative.
+
+Stop the API before rebuilding after a CSV replacement. Run `start.ps1 -RebuildData`
+to rebuild and restart, refreshing its cached analytics snapshot.
+
+---
+
 **[Open the live FinShield AI Streamlit app](https://sanchay-finshield-ai.streamlit.app/)** — executive charts, alert queue, transaction scoring, SHAP evidence and investigation workspace. No installation or sign-in required.
 
 **[Working Model and reviewer guide](Working%20Model.md)**

@@ -13,6 +13,7 @@ services:
       - "8000:8000"
     volumes:
       - ./models:/app/models:ro
+      - ./data/raw:/app/data/raw:ro
       - ./data/processed:/app/data/processed
     depends_on:
       postgres:

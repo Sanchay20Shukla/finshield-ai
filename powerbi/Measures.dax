@@ -1,0 +1,21 @@
+// Import daily.csv as Daily and segments.csv as Channels.
+// These aggregate tables are separate reporting subjects; do not join them.
+Transactions = SUM ( Daily[transactions] )
+Transaction Volume = SUM ( Daily[volume] )
+Fraud Events = SUM ( Daily[fraud_count] )
+Labeled Fraud Value = SUM ( Daily[fraud_value] )
+Fraud Event Rate = DIVIDE ( [Fraud Events], [Transactions], 0 )
+Fraud Loss Rate = DIVIDE ( [Labeled Fraud Value], [Transaction Volume], 0 )
+Rule Alerts = SUM ( Daily[alerts] )
+Rule Investigation Workload = DIVIDE ( [Rule Alerts], [Transactions], 0 )
+
+// For the PostgreSQL star model, import analytics.fact_transaction as FactTransaction.
+True Positives = COUNTROWS ( FILTER ( FactTransaction, FactTransaction[rule_alert] = TRUE () && FactTransaction[is_fraud] = TRUE () ) )
+False Positives = COUNTROWS ( FILTER ( FactTransaction, FactTransaction[rule_alert] = TRUE () && FactTransaction[is_fraud] = FALSE () ) )
+False Negatives = COUNTROWS ( FILTER ( FactTransaction, FactTransaction[rule_alert] = FALSE () && FactTransaction[is_fraud] = TRUE () ) )
+True Negatives = COUNTROWS ( FILTER ( FactTransaction, FactTransaction[rule_alert] = FALSE () && FactTransaction[is_fraud] = FALSE () ) )
+Baseline Recall = DIVIDE ( [True Positives], [True Positives] + [False Negatives], 0 )
+Baseline Precision = DIVIDE ( [True Positives], [True Positives] + [False Positives], 0 )
+Baseline False Positive Rate = DIVIDE ( [False Positives], [False Positives] + [True Negatives], 0 )
+Flagged Labeled Fraud Value = CALCULATE ( SUM ( FactTransaction[amount] ), FactTransaction[rule_alert] = TRUE (), FactTransaction[is_fraud] = TRUE () )
+// Do not title flagged labeled fraud value 'prevented loss': no intervention was measured.

@@ -30,3 +30,8 @@ mlartifacts/
 .streamlit/secrets.toml
 tmp/
 *.zip
+outputs/
+!models/reproduced/
+models/reproduced/*
+!models/reproduced/benchmark.json
+!models/reproduced/benchmark.csv
